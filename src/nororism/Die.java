@@ -2,8 +2,8 @@
  * Course: CSC1020
  * Lab 2 - Exceptions
  * Die class
- * Name: FIXME
- * Last Updated: FIXME
+ * Name: Marco Nororis
+ * Last Updated: 9/11/2024
  */
 package nororism;
 
@@ -30,37 +30,30 @@ public class Die {
      * less than 2 or greater than 100 and inputs 0 as the amount of sides.
      * @param numSides
      * a user inputted integer as the number of sides of the die
+     * @throws IllegalArgumentException
+     * throws IllegalArgumentException if the inputted numSides is less than 2 and more than 100
      */
-    public Die(int numSides) {
+    public Die(int numSides) throws IllegalArgumentException {
         random = new Random();
-        int sides;
-        try {
-            if (numSides > MIN_SIDES && numSides < MAX_SIDES) {
-                sides = numSides;
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } catch (IllegalArgumentException e){
-            System.out.println("sides out of bounds");
-            sides = 0;
+        if (numSides > MIN_SIDES && numSides < MAX_SIDES) {
+            this.numSides = numSides;
+        } else {
+            throw new IllegalArgumentException();
         }
-        this.numSides = sides;
     }
 
     /**
      * returns the current value of the die and returns the value to zero
      * @return
      * current value of die
+     * @throws DieNotRolledException
+     * throws when the current value is 0
      */
-    public int getCurrentValue(){
-        int value = currentValue;
-        try{
-            if (currentValue == 0){
-                throw new DieNotRolledException();
-            }
-        } catch (DieNotRolledException e){
-            System.out.println("Die value is zero");
+    public int getCurrentValue() throws DieNotRolledException{
+        if (currentValue == 0){
+            throw new DieNotRolledException();
         }
+        int value = currentValue;
         currentValue = 0;
         return value;
     }
@@ -69,6 +62,6 @@ public class Die {
      * generates a random number in the bounds set in the constructor
      */
     public void roll(){
-        currentValue = random.nextInt(1,numSides+1);
+        currentValue = random.nextInt(1, numSides+1);
     }
 }
