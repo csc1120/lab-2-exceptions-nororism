@@ -16,9 +16,12 @@ public class Driver {
         do {
             try {
                 int[] in = getInput();
-                Die[] dice = createDice(in[1], in[2]);
-            } catch (InputMismatchException e) {
-                System.out.println("Please enter a valid number of sides");
+                Die[] dice = createDice(in[0], in[1]);
+                rollDice(dice, in[1], in[2]);
+            } catch (InputMismatchException | IllegalArgumentException e) {
+                System.out.println("Please enter a valid number of sides\n");
+            } catch ( NullPointerException e){
+                System.out.println();
             }
         } while(1==1);
     }
@@ -33,37 +36,35 @@ public class Driver {
      * @return
      * array of numbers
      */
-    private static int[] getInput(){
+    private static int[] getInput() throws NullPointerException{
 
         int[] values = new int[3];
         String input;
         Scanner in = new Scanner(System.in);
-        boolean isValid = false;
 
         System.out.println("Please enter the number of dice to roll, how many sides the dice have" +
                            "and how many rolls to complete, separating the values by a space" +
-                           "Example: \"2 6 1000\"");
+                           " Example: \"2 6 1000\"");
         System.out.println("Enter configuration: ");
 
-        do{
-            int var = 0;
-            try{
-                input = in.nextLine();
-                Scanner buf = new Scanner(input);
-                values[0] = buf.nextInt();
-                var++;
-                values[1] = buf.nextInt();
-                var++;
-                values[2] = buf.nextInt();
+        int var = 0;
+        try{
+            input = in.nextLine();
+            Scanner buf = new Scanner(input);
+            values[0] = buf.nextInt();
+            var++;
+            values[1] = buf.nextInt();
+            var++;
+            values[2] = buf.nextInt();
 
-                return values;
-            } catch (InputMismatchException e){
-                System.out.println("Please enter only enter 3 integers followed by a space");
-            } catch (NoSuchElementException f){
-                System.out.println("Only found " + var + "elements, excepting 3");
-            }
-        } while (isValid);
-        return null;
+            return values;
+        } catch (InputMismatchException e){
+            System.out.println("Please enter only enter 3 integers followed by a space");
+        } catch (NoSuchElementException f){
+            System.out.println("Only found " + var + " element(s), excepting 3");
+        }
+
+        throw new NullPointerException();
     }
 
     private static Die[] createDice(int numDice, int numSides){
@@ -74,12 +75,30 @@ public class Driver {
         return dice;
     }
 
-    private static int[] rollDice(Die[] dice, int numSides, int numRolls){
-        return null;
+    private static int[] rollDice(Die[] dice, int numSides, int numRolls) throws DieNotRolledException {
+
+        int totalValues = numSides * dice.length;
+        int total = 0;
+        int[] value = new int[totalValues];
+        for(int i = 0; i < numRolls; i++){
+            for(Die j: dice){
+                j.roll();
+                total += j.getCurrentValue();
+            }
+            value[total-2]++;
+            total = 0;
+        }
+        return value;
     }
 
     private static int findMax(int[] rolls){
-        return 0;
+        int big = 0;
+        for(int i: rolls){
+            if(i > big){
+                big = i;
+            }
+        }
+        return big;
     }
 
     private static void report(int numDice, int[] rolls, int max){
