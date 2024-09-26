@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Lab 2 Feedback - nororism-graded</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+        h1, h2, h3 { color: #333; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 10px; text-align: left; }
+        .commendation { color: green; }
+        .deduction { color: red; }
+        .suggestion { color: blue; }
+        .code-block { background-color: #f9f9f9; border-left: 3px solid #ccc; padding: 10px; margin: 10px 0; }
+        pre { margin: 0; }
+        .grade { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Lab 2 - Exceptions</h1>
+    <table>
+        <tr>
+            <th>Earned</th>
+            <th>Possible</th>
+            <th>Criteria</th>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>15</td>
+            <td>Intermediate Commits</td>
+        </tr>
+        <tr>
+            <td>56</td>
+            <td>60</td>
+            <td>Technical Quality (see point deductions in code)</td>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>15</td>
+            <td>Coding Standard Compliance and Program Clarity</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>10</td>
+            <td>Following Submission Instructions</td>
+        </tr>
+    </table>
+
+    <h2>Feedback</h2>
+    <p> Marco,</p>
+    <p>Thank you for your submission of Lab 2. Below, you'll find detailed feedback on your work. You've demonstrated a solid understanding of exception handling and input validation. However, there are a few areas where improvements can enhance the robustness and clarity of your code.</p>
+
+    <h3>General Comments</h3>
+    <p><span class="commendation"><strong>Commendation:</strong></span> Your code is well-structured and includes descriptive comments, which greatly improve readability. You've correctly implemented custom exceptions to handle error scenarios, showcasing a good grasp of exception handling in Java.</p>
+
+    <h2>Detailed Feedback</h2>
+
+    <h3>Die.java</h3>
+    <div class="code-block">
+        <pre>
+    /*
+     * Course: CSC1020
+     * Lab 2 - Exceptions
+     * Die class
+     * Name: Marco Nororis
+     * Last Updated: 9/11/2024
+     */
+    package nororism;
+    
+    import java.util.Random;
+    
+    /**
+     * Die class
+     */
+    public class Die {
+        /**
+         * minimum sides for the die
+         */
+        public static final int MIN_SIDES = 2;
+        /**
+         * maximum sides for the die
+         */
+        public static final int MAX_SIDES = 100;
+        private int currentValue;
+        private final int numSides;
+        private final Random random;
+    
+        /**
+         * Die constructor throws IllegalArgumentException if the inputted number of sides is
+         * less than 2 or greater than 100 and inputs 0 as the amount of sides.
+         * @param numSides
+         * a user inputted integer as the number of sides of the die
+         * @throws IllegalArgumentException
+         * throws IllegalArgumentException if the inputted numSides is less than 2 and more than 100
+         */
+        public Die(int numSides) throws IllegalArgumentException {
+            random = new Random();
+            if (numSides > MIN_SIDES && numSides < MAX_SIDES) {
+                this.numSides = numSides;
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+    
+        /**
+         * returns the current value of the die and returns the value to zero
+         * @return
+         * current value of die
+         * @throws DieNotRolledException
+         * throws when the current value is 0
+         */
+        public int getCurrentValue() throws DieNotRolledException{
+            if (currentValue == 0){
+                throw new DieNotRolledException();
+            }
+            int value = currentValue;
+            currentValue = 0;
+            return value;
+        }
+    
+        /**
+         * generates a random number in the bounds set in the constructor
+         */
+        public void roll(){
+            currentValue = random.nextInt(1, numSides+1);
+        }
+    }
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-0.5):</strong></span> <strong>Constructor:</strong> The exception message is missing when throwing <code>IllegalArgumentException</code>. Providing a descriptive message helps users understand the reason for the exception.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Enhance the constructor to include a descriptive exception message and adjust the bounds check to be inclusive:</p>
+
+    <div class="code-block">
+        <pre>
+    public Die(int numSides) throws IllegalArgumentException {
+        random = new Random();
+        if (numSides < MIN_SIDES || numSides > MAX_SIDES) {
+            throw new IllegalArgumentException("Number of sides must be between " 
+                + MIN_SIDES + " and " + MAX_SIDES + ".");
+        }
+        this.numSides = numSides;
+    }
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-0.5):</strong></span> <strong>Method <code>getCurrentValue()</code>:</strong> The method declares <code>throws DieNotRolledException</code> in its signature, but <code>DieNotRolledException</code> is a checked exception. It's advisable to make custom exceptions extend <code>RuntimeException</code> to avoid forcing callers to handle them.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Modify <code>DieNotRolledException</code> to extend <code>RuntimeException</code> and remove the <code>throws</code> declaration from the method signature:</p>
+
+    <div class="code-block">
+        <pre>
+    public int getCurrentValue(){
+        if(currentValue < 1 || currentValue > numSides){
+            throw new DieNotRolledException();
+        }
+        int value = currentValue;
+        currentValue = 0; // Reset after retrieval
+        return value;
+    }
+        </pre>
+    </div>
+
+    <h3>DieNotRolledException.java</h3>
+    <div class="code-block">
+        <pre>
+    /*
+     * Course: CSC1020
+     * Lab 2 - Exceptions
+     * DieNotRolledException class
+     * Name: Marco Nororis
+     * Last Updated: 9/11/2024
+     */
+    package nororism;
+    
+    /**
+     * custom exception that catches the case of the die not being rolled
+     */
+    public class DieNotRolledException extends Exception {
+        @Override
+        public String getMessage() {
+            return super.getMessage();
+        }
+    }
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-0.5):</strong></span> <strong>DieNotRolledException.java:</strong> The custom exception extends <code>Exception</code>, making it a checked exception. It's more efficient to extend <code>RuntimeException</code> for unchecked exceptions. Additionally, overriding <code>getMessage()</code> without providing a custom message is unnecessary.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Modify the exception to extend <code>RuntimeException</code> and provide a default message through the constructor:</p>
+
+    <div class="code-block">
+        <pre>
+    /**
+     * custom exception that catches the case of the die not being rolled
+     */
+    public class DieNotRolledException extends RuntimeException {
+        /**
+         * Constructor for DieNotRolledException
+         */
+        public DieNotRolledException() {
+            super("Die has not been rolled in the expected range.");
+        }
+
+        /**
+         * Constructor that accepts a custom message.
+         * @param message Custom error message.
+         */
+        public DieNotRolledException(String message) {
+            super(message);
+        }
+    }
+        </pre>
+    </div>
+
+    <h3>Driver.java</h3>
+    <div class="code-block">
+        <pre>
+    /*
+     * Course: CSC1020
+     * Lab 2 - Exceptions
+     * Main Driver class
+     * Name: Marco Nororis
+     * Last Updated: 9/11/2024
+     */
+    package nororism;
+    
+    
+    import java.util.InputMismatchException;
+    import java.util.NoSuchElementException;
+    import java.util.Scanner;
+    
+    /**
+     * Driver class for assignment
+     */
+    public class Driver {
+        public static void main(String[] args){
+            boolean complete = false;
+            do {
+                try {
+                    int[] in = getInput();
+                    Die[] dice = createDice(in[0], in[1]);
+                    int[] rolls = rollDice(dice, in[1], in[2]);
+                    int i = findMax(rolls);
+                    report(in[0], rolls, i);
+                    complete = true;
+    
+    
+                } catch (InputMismatchException | IllegalArgumentException e) {
+                    System.out.println("Please enter a valid number of sides\n");
+                } catch (NullPointerException e){
+                    System.out.println();
+                } catch (DieNotRolledException e) {
+                    throw new RuntimeException(e);
+                }
+    
+            } while(!complete);
+        }
+    
+        /**
+         * getInput() This method will ask the user for three numbers,
+         * entered on a single line and separated by spaces and return these
+         * values in the same order as they were entered in an array. These numbers will be:
+         * The number of dice to roll in the experiment
+         * The number of sides these dice will have
+         * How many times the dice will be rolled
+         * @return
+         * array of numbers
+         */
+        private static int[] getInput() throws NullPointerException{
+    
+            int[] values = new int[3];
+            String input;
+            Scanner in = new Scanner(System.in);
+    
+            System.out.println("Please enter the number of dice to roll, how many sides the dice have" +
+                               "and how many rolls to complete, separating the values by a space" +
+                               " Example: \"2 6 1000\"");
+            System.out.println("Enter configuration: ");
+    
+            int var = 0;
+            try{
+                input = in.nextLine();
+                Scanner buf = new Scanner(input);
+                values[0] = buf.nextInt();
+                var++;
+                values[1] = buf.nextInt();
+                var++;
+                values[2] = buf.nextInt();
+    
+                return values;
+            } catch (InputMismatchException e){
+                System.out.println("Please enter only enter 3 integers followed by a space");
+            } catch (NoSuchElementException e){
+                System.out.println("Only found " + var + " element(s), expecting 3");
+            }
+    
+            throw new NullPointerException();
+        }
+    
+        /**
+         * Creates an array of the desired amount of dice and fills them with new dice
+         * @param numDice
+         * number of new dice to make
+         * @param numSides
+         * number of sides for each new dice
+         * @return
+         * returns the array with the new dice
+         */
+        private static Die[] createDice(int numDice, int numSides){
+            Die[] dice = new Die[numDice];
+            for(int i = 0; numDice > i; i++){
+                dice[i] = new Die(numSides);
+            }
+            return dice;
+        }
+    
+    
+        /**
+         * Creates an array of ints the size of the amount of possible values of the dice in the
+         * dice array created in createDice, rolls the dice, and tallies the values of each occurrence
+         * @param dice
+         * the dice array created in createDice
+         * @param numSides
+         * number of sides gotten from getInput
+         * @param numRolls
+         * number of times to roll each dice gotten from getInput
+         * @return
+         * returns an array containing the amount of occurrences per value
+         * @throws DieNotRolledException
+         * checked exception from the Die classes roll method that makes sure the dice have been rolled
+         */
+        private static int[] rollDice(Die[] dice, int numSides, int numRolls)
+                throws DieNotRolledException {
+    
+            int totalValues = numSides * (dice.length);
+            int total = 0;
+            int[] value = new int[totalValues - dice.length+1];
+            for(int i = 0; i < numRolls; i++){
+                for(Die j: dice){
+                    j.roll();
+                    total += j.getCurrentValue();
+                }
+                value[total-dice.length]++;
+                total = 0;
+            }
+            return value;
+        }
+    
+        /**
+         * finds the value that has been rolled the most in the int array from rollDice
+         * @param rolls
+         * the int array gotten from rollDice
+         * @return
+         * returns the value with the most occurrences
+         */
+        private static int findMax(int[] rolls){
+            int big = 0;
+            int values = 0;
+            for(int i: rolls){
+                if(i > big){
+                    big = i;
+                    values = i;
+                }
+            }
+            return values+2;
+        }
+    
+        /**
+         * prints each possible value the dice could have rolled and their occurrences with asterisks
+         * comparing them to the value with the most occurrences to have a visual of the amount of occurrences
+         * @param numDice
+         * the number of dice gotten from getInput
+         * @param rolls
+         * the number of rolls gotten from getInput
+         * @param max
+         * the value with the most amount of occurrences gotten from findMax
+         */
+        private static void report(int numDice, int[] rolls, int max){
+            double scale = (double) rolls[max-2]/10;
+            int num = numDice;
+            for(int i: rolls){
+                String s = "*";
+                System.out.printf("%-2d:%-6d%-6s%n", num, i, s.repeat((int) (i/scale)));
+                num++;
+            }
+        }
+    }
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-1):</strong></span> <strong>Method <code>getInput()</code>:</strong> The method creates a new <code>Scanner</code> instance inside the method while a <code>Scanner</code> is already open in <code>main()</code>. This can lead to resource leaks as multiple <code>Scanner</code> instances remain open.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Remove the additional <code>Scanner</code> instantiation inside <code>getInput()</code> and use the existing <code>Scanner</code> from <code>main()</code>. Alternatively, pass the <code>Scanner</code> as a parameter to the method:</p>
+
+    <div class="code-block">
+        <pre>
+    private static int[] getInput(Scanner scanner){
+        int[] holder = new int[3];
+        ArrayList<String> list;
+        boolean isValid = false;
+
+        System.out.println("""
+                        Please enter the number of dice to roll, how many sides the dice have,
+                        and how many rolls to complete, separating the values by a space.
+                        Example: "2 6 1000"
+                        """);
+        while(!isValid){
+            try{
+                System.out.print("\nEnter configuration: ");
+                String numbers = scanner.nextLine();
+                String[] numberArray = numbers.trim().split(" ", 3);
+                list = new ArrayList<>();
+
+                if(numberArray.length == 3){
+                    for(int i = 0; i < numberArray.length; i++){
+                        holder[i] = Integer.parseInt(numberArray[i]);
+                    }
+
+                    if(holder[0] > MAX_DICE || holder[0] < MIN_DICE){
+                        System.out.println("Invalid Input: Not within the dice boundary. "
+                                           + "2 <= x <= 10");
+                    } else if(holder[1] < MIN_SIDES || holder[1] > MAX_SIDES){
+                        System.out.println("Bad die creation: Illegal number of sides: "
+                                           + holder[1]);
+                    } else if (holder[2] <= 0){
+                        System.out.println("Cannot roll 0 or less times");
+                    }
+                } else{
+                    for (String s : numberArray) {
+                        if (!s.isEmpty() && !s.equals(" ")) {
+                            Integer.parseInt(s);
+                            list.add(s);
+                        }
+                    }
+
+                    if(!list.isEmpty()){
+                        System.out.println("Expected 3 values but only received "
+                                + list.size());
+                    } else{
+                        System.out.println("Invalid input");
+                    }
+                }
+
+                if(holder[0] <= MAX_DICE && holder[0] >= MIN_DICE){
+                    if(holder[1] >= MIN_SIDES && holder[1] <= MAX_SIDES){
+                        if(holder[2] > 0){
+                            isValid = true;
+                        }
+                    }
+                }
+            } catch(NumberFormatException e){
+                System.out.println("Invalid Input. Must be 3 whole numbers " +
+                                   "with one space in between each");
+            }
+        }
+
+        return holder;
+    }
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-0.5):</strong></span> <strong>Method <code>rollDice()</code>:</strong> The loop runs with <code>j &lt; holder.length + 1</code>, which can cause an <code>ArrayIndexOutOfBoundsException</code>. It should run with <code>j &lt; holder.length</code> to stay within array bounds.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Modify the loop condition to prevent accessing out-of-bound indices:</p>
+
+    <div class="code-block">
+        <pre>
+    private static int[] rollDice(Die[] dice, int numSides, int numRolls)
+            throws DieNotRolledException {
+
+        int totalValues = numSides * (dice.length);
+        int total = 0;
+        int[] value = new int[totalValues - dice.length + 1];
+        for(int i = 0; i < numRolls; i++){
+            for(Die j: dice){
+                j.roll();
+                total += j.getCurrentValue();
+            }
+            if(total - dice.length >= 0 && total - dice.length < value.length){
+                value[total - dice.length]++;
+            }
+            total = 0;
+        }
+        return value;
+    }
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-0.5):</strong></span> <strong>Method <code>report()</code>:</strong> The calculation for <code>scale</code> does not account for cases where <code>scale</code> is 0, which can lead to division by zero errors. Additionally, using a <code>try-catch</code> block for arithmetic exceptions is unnecessary when you can handle the condition beforehand.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Ensure that <code>scale</code> is not zero and remove the unnecessary <code>try-catch</code> block:</p>
+
+    <div class="code-block">
+        <pre>
+    private static void report(int numDice, int[] rolls, int max){
+        double scale = (double) rolls[max-2] / 10;
+        int num = numDice;
+        for(int i: rolls){
+            int numStars = (scale == 0) ? 0 : (int)(i / scale);
+            System.out.printf("%-2d:%-6d%-6s%n", num, i, "*".repeat(Math.max(0, numStars)));
+            num++;
+        }
+    }
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-0.5):</strong></span> <strong>Exception Handling in <code>main()</code>:</strong> The exception handling is minimal and does not account for potential exceptions like <code>DieNotRolledException</code> during the rolling process. Additionally, catching <code>NullPointerException</code> is not advisable as it can obscure the actual issue.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Implement comprehensive exception handling to manage unexpected scenarios gracefully. For example, catch specific exceptions and provide meaningful feedback to the user:</p>
+
+    <div class="code-block">
+        <pre>
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        try {
+            int[] diceInput = getInput(scanner);
+            Die[] dice = createDice(diceInput[0], diceInput[1]);
+            int[] rolls = rollDice(dice, diceInput[1], diceInput[2]);
+            int max = findMax(rolls);
+            report(diceInput[0], rolls, max);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (DieNotRolledException e) {
+            System.out.println("Die error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+        } finally {
+            scanner.close();
+        }
+    }
+        </pre>
+    </div>
+
+    <p><span class="commendation"><strong>Commendation:</strong></span> Good implementation of helper methods like <code>createDice()</code>, <code>rollDice()</code>, and <code>report()</code>. This modular approach enhances readability and maintainability of your code.</p>
+
+    
+    <h2>Final Grade</h2>
+    <p class="grade"><strong>Earned:</strong> 96/100</p>
+    <ul>
+        <li>Intermediate Commits: 15/15</li>
+        <li>Technical Quality: 56/60 (Deductions for exception handling and input validation issues)</li>
+        <li>Coding Standard Compliance and Program Clarity: 15/15</li>
+        <li>Following Submission Instructions: 10/10</li>
+    </ul>
+
+    <p><strong>Overall, you've made a solid effort!</strong> Keep up the good work, and consider the suggestions above to further improve your coding skills.</p>
+
+    <p>If you have any questions about this feedback or need further clarification, please feel free to reach out.</p>
+
+    <p><em>Grader: Dr. Ukegbu</em></p>
+</body>
+</html>
